@@ -2,6 +2,121 @@
 *{box-sizing:border-box}html,body,#map{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial}#map{background:#e5e7eb}.top{position:absolute;z-index:1000;top:10px;left:10px;right:10px;min-height:58px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:17px;display:flex;align-items:center;gap:10px;padding:9px 12px;box-shadow:0 12px 32px #0005}.logo{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#22c55e,#0ea5e9);font-weight:900}.brand b{display:block}.brand small{color:#94a3b8}.search{margin-left:auto;background:#ffffff0d;border:1px solid #ffffff1f;color:#fff;border-radius:11px;padding:10px 12px;width:min(310px,38vw);outline:none}.panel{position:absolute;z-index:999;left:10px;top:82px;bottom:10px;width:300px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:18px;padding:14px;overflow:auto;box-shadow:0 12px 32px #0005}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#ffffff0b;border:1px solid #ffffff18;border-radius:12px;padding:10px}.stat b{font-size:21px}.muted{color:#94a3b8;font-size:11px}.panel select{width:100%;margin:13px 0;padding:11px;border-radius:10px;background:#0f172a;color:#fff;border:1px solid #ffffff22}.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px}.li{display:flex;align-items:center;gap:7px;background:#ffffff08;border-radius:8px;padding:7px;font-size:11px}.sw{width:12px;height:12px;border-radius:3px;border:1px solid #fff8}.menu{display:none;position:absolute;z-index:1001;left:10px;bottom:calc(12px + env(safe-area-inset-bottom,0px));border:0;background:#07111fee;color:#fff;padding:11px 14px;border-radius:13px;font-weight:700}.tools{position:absolute;z-index:1000;right:10px;top:82px;display:grid;gap:7px}.tool{width:42px;height:42px;border:1px solid #ffffff22;background:#07111fee;color:#fff;border-radius:12px;font-size:18px}.info{position:absolute;z-index:1000;right:10px;bottom:10px;width:260px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:14px;padding:12px;display:none}.info.show{display:block}.leaflet-control-zoom{display:none}
 @media(max-width:720px){.top{padding:8px 9px}.logo{width:36px;height:36px}.brand small{display:none}.brand b{font-size:13px}.search{width:auto;min-width:0;flex:1;padding:9px;font-size:12px}.panel{top:auto;left:10px;right:10px;bottom:68px;width:auto;max-height:58vh;transform:translateY(calc(100% + 90px));opacity:0;pointer-events:none;transition:.22s}.panel.open{transform:none;opacity:1;pointer-events:auto}.menu{display:block}.info{left:10px;right:10px;bottom:68px;width:auto}.legend{grid-template-columns:1fr 1fr}.leaflet-control-attribution{font-size:9px!important}}
 </style></head><body><div id="map"></div><div class="top"><div class="logo">iQ</div><div class="brand"><b>iQuyHoach WebGIS</b><small>A Olympic · QHPK · Hà Nội</small></div><input id="q" class="search" placeholder="Tìm mã đất, ví dụ 100"></div><div class="panel" id="panel"><div class="stats"><div class="stat"><b id="fc">—</b><div class="muted">Polygon</div></div><div class="stat"><b id="cc">—</b><div class="muted">Mã loại đất</div></div></div><select id="filter"><option value="">Tất cả mã đất</option></select><b>Chú giải</b><div class="legend" id="legend"></div><p class="muted">Nguồn: A Olympic_iquyhoachQHPK · 2.315 đối tượng · WGS84 EPSG:4326</p></div><button class="menu" id="menu">☰ Lớp dữ liệu</button><div id="baseLabel" style="position:absolute;z-index:1000;right:60px;top:88px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:10px;padding:7px 10px;font-size:11px;white-space:nowrap">Google Vệ tinh</div><div class="tools"><button class="tool" id="zin">＋</button><button class="tool" id="zout">−</button><button class="tool" id="home">⌂</button><button class="tool" id="base">◫</button></div><div class="info" id="info"></div><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
-(async()=>{const D=await fetch('a_olympic.json?v=original2315').then(r=>r.json());const map=L.map('map',{zoomControl:false,preferCanvas:false});const baseNames=['Google Vệ tinh','Google Hybrid','Đường phố'];const bases=[L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:21,attribution:'© Google'}),L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:21,attribution:'© Google'}),L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,attribution:'© OpenStreetMap'})];let bi=0;bases[0].addTo(map);
-const colors={'1':'#ff00bf','3':'#d4531c','5':'#995f4c','6':'#7ca500','7':'#00a500','11':'#7f3f00','12':'#ff7f7f','13':'#7f7f00','16':'#898989','57':'#f4996c','78':'#00cc99','93':'#e6a519','100':'#d2d2d2','101':'#007299','102':'#cc00cc','155':'#8ca8ba','170':'#0066cc','922':'#efa748','933':'#e7d35f','971':'#66cc00','6661':'#ff7043','6662':'#8bc34a','6666':'#d4e157'};const opacity={'100':0.5};const codes=[...new Set(D.features.map(f=>String(f.properties.ky_hieu)))].sort((a,b)=>+a-+b);document.getElementById('fc').textContent=D.features.length.toLocaleString('vi-VN');document.getElementById('cc').textContent=codes.length;let cur='';const style=f=>{const k=String(f.properties.ky_hieu),a=!cur||k===cur;return{color:a?'#111827':'#64748b',weight:a?.65:.2,fillColor:colors[k]||'#94a3b8',fillOpacity:a?(opacity[k]??1):.04}};const info=document.getElementById('info');const g=L.geoJSON(D,{style,smoothFactor:0,onEachFeature:(f,l)=>l.on('click',()=>{const k=String(f.properties.ky_hieu);info.innerHTML='<b style="font-size:17px;color:'+(colors[k]||'#fff')+'">Mã '+k+'</b><div style="margin-top:7px">Phân khu: <b>'+(f.properties.phan_khu||'-')+'</b></div><div>Ghi chú: <b>'+(f.properties.ghi_chu||'-')+'</b></div><div class="muted" style="margin-top:7px">Nguồn: A Olympic_iquyhoachQHPK</div>';info.classList.add('show')})}).addTo(map);function fit(layer=g){const b=layer.getBounds();if(innerWidth<=720)map.fitBounds(b,{paddingTopLeft:[18,85],paddingBottomRight:[18,100],maxZoom:17});else map.fitBounds(b,{paddingTopLeft:[330,90],paddingBottomRight:[60,60],maxZoom:17})}fit();const sel=document.getElementById('filter'),leg=document.getElementById('legend');codes.forEach(k=>{sel.insertAdjacentHTML('beforeend','<option value="'+k+'">Mã '+k+'</option>');leg.insertAdjacentHTML('beforeend','<div class="li"><i class="sw" style="background:'+(colors[k]||'#94a3b8')+'"></i>Mã '+k+'</div>')});function filter(k){cur=k;g.setStyle(style);if(k){const a=[];g.eachLayer(l=>{if(String(l.feature.properties.ky_hieu)===k)a.push(l)});if(a.length)fit(L.featureGroup(a))}else fit()}sel.onchange=e=>filter(e.target.value);document.getElementById('q').onkeydown=e=>{if(e.key==='Enter'){const v=e.target.value.trim();sel.value=v;filter(v)}};document.getElementById('menu').onclick=()=>{const p=document.getElementById('panel'),b=document.getElementById('menu');p.classList.toggle('open');b.textContent=p.classList.contains('open')?'✕ Đóng':'☰ Lớp dữ liệu';};document.getElementById('zin').onclick=()=>map.zoomIn();document.getElementById('zout').onclick=()=>map.zoomOut();document.getElementById('home').onclick=()=>fit();const baseNames=['Đường phố','Vệ tinh','Địa hình'];document.getElementById('base').onclick=()=>{map.removeLayer(bases[bi]);bi=(bi+1)%bases.length;bases[bi].addTo(map);if(map.hasLayer(g))g.bringToFront();document.getElementById('baseLabel').textContent=baseNames[bi]}bi=(bi+1)%bases.length;bases[bi].addTo(map);g.bringToFront();const bl=document.getElementById('baseLabel');if(bl)bl.textContent=baseNames[bi]};})().catch(e=>{document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;z-index:9999;inset:20px;background:#111827;color:white;padding:20px;border-radius:14px">Không tải được dữ liệu: '+e.message+'</div>')});
+(async()=>{
+  const D=await fetch('a_olympic.json?v=original2315').then(r=>{
+    if(!r.ok) throw new Error('Không tải được a_olympic.json ('+r.status+')');
+    return r.json();
+  });
+
+  const map=L.map('map',{zoomControl:false,preferCanvas:true});
+
+  const baseNames=['Google Vệ tinh','Google Hybrid','Đường phố'];
+  const bases=[
+    L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:21,attribution:'© Google'}),
+    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:21,attribution:'© Google'}),
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,attribution:'© OpenStreetMap'})
+  ];
+  let bi=0;
+  bases[bi].addTo(map);
+  document.getElementById('baseLabel').textContent=baseNames[bi];
+
+  const colors={
+    '1':'#ff00bf','3':'#d4531c','5':'#995f4c','6':'#7ca500','7':'#00a500',
+    '11':'#7f3f00','12':'#ff7f7f','13':'#7f7f00','16':'#898989','57':'#f4996c',
+    '78':'#00cc99','93':'#e6a519','100':'#d2d2d2','101':'#007299','102':'#cc00cc',
+    '155':'#8ca8ba','170':'#0066cc','922':'#efa748','933':'#e7d35f','971':'#66cc00',
+    '6661':'#ff7043','6662':'#8bc34a','6666':'#d4e157'
+  };
+  const opacity={'100':0.5};
+  const codes=[...new Set(D.features.map(f=>String(f.properties.ky_hieu)))].sort((a,b)=>+a-+b);
+
+  document.getElementById('fc').textContent=D.features.length.toLocaleString('vi-VN');
+  document.getElementById('cc').textContent=codes.length;
+
+  let curFilter='';
+  const style=f=>{
+    const k=String(f.properties.ky_hieu), active=!curFilter||k===curFilter;
+    return {
+      color:active?'#111827':'#64748b',
+      weight:active?0.7:0.2,
+      fillColor:colors[k]||'#94a3b8',
+      fillOpacity:active?(opacity[k]??0.78):0.04
+    };
+  };
+
+  const info=document.getElementById('info');
+  const g=L.geoJSON(D,{
+    style,
+    smoothFactor:0,
+    onEachFeature:(f,l)=>l.on('click',()=>{
+      const k=String(f.properties.ky_hieu);
+      info.innerHTML=
+        '<b style="font-size:17px;color:'+(colors[k]||'#fff')+'">Mã '+k+'</b>'+
+        '<div style="margin-top:7px">Phân khu: <b>'+(f.properties.phan_khu||'-')+'</b></div>'+
+        '<div>Ghi chú: <b>'+(f.properties.ghi_chu||'-')+'</b></div>'+
+        '<div class="muted" style="margin-top:7px">Nguồn: A Olympic_iquyhoachQHPK</div>';
+      info.classList.add('show');
+    })
+  }).addTo(map);
+
+  function fit(layer=g){
+    const b=layer.getBounds();
+    if(!b || !b.isValid()) return;
+    if(innerWidth<=720){
+      map.fitBounds(b,{paddingTopLeft:[18,85],paddingBottomRight:[18,100],maxZoom:17});
+    }else{
+      map.fitBounds(b,{paddingTopLeft:[330,90],paddingBottomRight:[60,60],maxZoom:17});
+    }
+  }
+  fit();
+
+  const sel=document.getElementById('filter');
+  const leg=document.getElementById('legend');
+  codes.forEach(k=>{
+    sel.insertAdjacentHTML('beforeend','<option value="'+k+'">Mã '+k+'</option>');
+    leg.insertAdjacentHTML('beforeend','<div class="li"><i class="sw" style="background:'+(colors[k]||'#94a3b8')+'"></i>Mã '+k+'</div>');
+  });
+
+  function applyFilter(k){
+    curFilter=k;
+    g.setStyle(style);
+    if(k){
+      const a=[];
+      g.eachLayer(l=>{ if(String(l.feature.properties.ky_hieu)===k) a.push(l); });
+      if(a.length) fit(L.featureGroup(a));
+    }else fit();
+  }
+
+  sel.onchange=e=>applyFilter(e.target.value);
+  document.getElementById('q').onkeydown=e=>{
+    if(e.key==='Enter'){
+      const v=e.target.value.trim();
+      sel.value=v;
+      applyFilter(v);
+    }
+  };
+
+  document.getElementById('menu').onclick=()=>{
+    const p=document.getElementById('panel'), b=document.getElementById('menu');
+    p.classList.toggle('open');
+    b.textContent=p.classList.contains('open')?'✕ Đóng':'☰ Lớp dữ liệu';
+    setTimeout(()=>map.invalidateSize(),250);
+  };
+  document.getElementById('zin').onclick=()=>map.zoomIn();
+  document.getElementById('zout').onclick=()=>map.zoomOut();
+  document.getElementById('home').onclick=()=>fit();
+  document.getElementById('base').onclick=()=>{
+    map.removeLayer(bases[bi]);
+    bi=(bi+1)%bases.length;
+    bases[bi].addTo(map);
+    if(map.hasLayer(g)) g.bringToFront();
+    document.getElementById('baseLabel').textContent=baseNames[bi];
+  };
+
+  window.addEventListener('resize',()=>map.invalidateSize());
+})().catch(e=>{
+  document.body.insertAdjacentHTML('beforeend',
+    '<div style="position:fixed;z-index:9999;left:12px;right:12px;top:90px;background:#7f1d1d;color:white;padding:14px;border-radius:14px;font:14px system-ui">Lỗi WebGIS: '+e.message+'</div>');
+  console.error(e);
+});
 </script></body></html>
