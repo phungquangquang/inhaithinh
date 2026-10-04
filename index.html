@@ -1,12 +1,18 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>iQuyHoach WebGIS · A Olympic</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><style>
 *{box-sizing:border-box}html,body,#map{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial}#map{background:#e5e7eb}.top{position:absolute;z-index:1000;top:10px;left:10px;right:10px;min-height:58px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:17px;display:flex;align-items:center;gap:10px;padding:9px 12px;box-shadow:0 12px 32px #0005}.logo{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#22c55e,#0ea5e9);font-weight:900}.brand b{display:block}.brand small{color:#94a3b8}.search{margin-left:auto;background:#ffffff0d;border:1px solid #ffffff1f;color:#fff;border-radius:11px;padding:10px 12px;width:min(310px,38vw);outline:none}.panel{position:absolute;z-index:999;left:10px;top:82px;bottom:10px;width:300px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:18px;padding:14px;overflow:auto;box-shadow:0 12px 32px #0005}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#ffffff0b;border:1px solid #ffffff18;border-radius:12px;padding:10px}.stat b{font-size:21px}.muted{color:#94a3b8;font-size:11px}.panel select{width:100%;margin:13px 0;padding:11px;border-radius:10px;background:#0f172a;color:#fff;border:1px solid #ffffff22}.legend{display:grid;grid-template-columns:1fr;gap:6px}.li{display:flex;align-items:flex-start;gap:7px;background:#ffffff08;border-radius:8px;padding:7px;font-size:11px;line-height:1.25}.sw{width:12px;height:12px;border-radius:3px;border:1px solid #fff8}.menu{display:none;position:absolute;z-index:1001;left:10px;bottom:calc(12px + env(safe-area-inset-bottom,0px));border:0;background:#07111fee;color:#fff;padding:11px 14px;border-radius:13px;font-weight:700}.tools{position:absolute;z-index:1000;right:10px;top:82px;display:grid;gap:7px}.tool{width:42px;height:42px;border:1px solid #ffffff22;background:#07111fee;color:#fff;border-radius:12px;font-size:18px}.info{position:absolute;z-index:1000;right:10px;bottom:10px;width:260px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:14px;padding:12px;display:none}.info.show{display:block}.leaflet-control-zoom{display:none}
 @media(max-width:720px){.top{padding:8px 9px}.logo{width:36px;height:36px}.brand small{display:none}.brand b{font-size:13px}.search{width:auto;min-width:0;flex:1;padding:9px;font-size:12px}.panel{top:auto;left:10px;right:10px;bottom:68px;width:auto;max-height:58vh;transform:translateY(calc(100% + 90px));opacity:0;pointer-events:none;transition:.22s}.panel.open{transform:none;opacity:1;pointer-events:auto}.menu{display:block}.info{left:10px;right:10px;bottom:68px;width:auto}.legend{grid-template-columns:1fr}.leaflet-control-attribution{font-size:9px!important}}
-</style></head><body><div id="map"></div><div class="top"><div class="logo">iQ</div><div class="brand"><b>iQuyHoach WebGIS</b><small>A Olympic · QHPK · Hà Nội</small></div><input id="q" class="search" placeholder="Tìm mã đất, ví dụ 100"></div><div class="panel" id="panel"><div class="stats"><div class="stat"><b id="fc">—</b><div class="muted">Polygon</div></div><div class="stat"><b id="cc">—</b><div class="muted">Mã loại đất</div></div></div><select id="filter"><option value="">Tất cả mã đất</option></select><b>Chú giải</b><div class="legend" id="legend"></div><p class="muted">Nguồn: A Olympic_iquyhoachQHPK · 2.315 đối tượng · WGS84 EPSG:4326</p><a href="https://github.com/phungquangquang/inhaithinh/releases/download/gis-hoso-2026-10-04/HoSoGIS_A_Olympic.zip" target="_blank" rel="noopener" style="display:block;margin-top:10px;padding:11px 12px;border-radius:10px;background:#22c55e;color:#07111f;font-weight:700;text-decoration:none;text-align:center">⇩ Tải hồ sơ GIS A Olympic (ZIP, 49,6 MB)</a><p class="muted">Gồm QuyHoach.gdb, HienTrang.gdb, NenDiaHinh.gdb và AnhDinhKem.</p></div><button class="menu" id="menu">☰ Lớp dữ liệu</button><div id="baseLabel" style="position:absolute;z-index:1000;right:60px;top:88px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:10px;padding:7px 10px;font-size:11px;white-space:nowrap">Google Vệ tinh</div><div class="tools"><button class="tool" id="zin">＋</button><button class="tool" id="zout">−</button><button class="tool" id="home">⌂</button><button class="tool" id="base">◫</button></div><div class="info" id="info"></div><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+</style></head><body><div id="map"></div><div class="top"><div class="logo">iQ</div><div class="brand"><b>iQuyHoach WebGIS</b><small>A Olympic · QHPK · Hà Nội</small></div><input id="q" class="search" placeholder="Tìm mã đất, ví dụ 100"></div><div class="panel" id="panel"><div class="stats"><div class="stat"><b id="fc">—</b><div class="muted">Polygon</div></div><div class="stat"><b id="cc">—</b><div class="muted">Mã loại đất</div></div></div><div style="margin-top:12px;padding:10px;background:#ffffff0b;border:1px solid #ffffff18;border-radius:10px"><label style="display:flex;gap:8px;align-items:center;font-size:12px;font-weight:700"><input id="toggleGDB" type="checkbox" checked> QuyHoach.gdb · Chức năng sử dụng đất</label><div class="muted" style="margin-top:5px">5.088 vùng · dữ liệu quy hoạch trong hồ sơ GIS</div></div><div id="gdbLegend" class="legend" style="margin-top:8px"></div><div style="margin-top:12px"><b>Lớp A Olympic · mã loại đất</b><select id="filter"><option value="">Tất cả mã đất</option></select><div class="legend" id="legend"></div></div><p class="muted">Nguồn: A Olympic_iquyhoachQHPK · 2.315 đối tượng · WGS84 EPSG:4326</p><a href="https://github.com/phungquangquang/inhaithinh/releases/download/gis-hoso-2026-10-04/HoSoGIS_A_Olympic.zip" target="_blank" rel="noopener" style="display:block;margin-top:10px;padding:11px 12px;border-radius:10px;background:#22c55e;color:#07111f;font-weight:700;text-decoration:none;text-align:center">⇩ Tải hồ sơ GIS A Olympic (ZIP, 49,6 MB)</a><p class="muted">Gồm QuyHoach.gdb, HienTrang.gdb, NenDiaHinh.gdb và AnhDinhKem.</p></div><button class="menu" id="menu">☰ Lớp dữ liệu</button><div id="baseLabel" style="position:absolute;z-index:1000;right:60px;top:88px;background:#07111fee;color:#fff;border:1px solid #ffffff22;border-radius:10px;padding:7px 10px;font-size:11px;white-space:nowrap">Google Vệ tinh</div><div class="tools"><button class="tool" id="zin">＋</button><button class="tool" id="zout">−</button><button class="tool" id="home">⌂</button><button class="tool" id="base">◫</button></div><div class="info" id="info"></div><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
 (async()=>{
   const D=await fetch('a_olympic.json?v=original2315').then(r=>{
     if(!r.ok) throw new Error('Không tải được a_olympic.json ('+r.status+')');
     return r.json();
   });
+  const gr=await fetch('quyhoach_sdd.geojson.gz.b64?v=gdb5088');
+  if(!gr.ok) throw new Error('Không tải được lớp QuyHoach.gdb ('+gr.status+')');
+  const encoded=(await gr.text()).trim(), raw=atob(encoded);
+  const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const G=await new Response(stream).json();
 
   const map=L.map('map',{zoomControl:false,preferCanvas:true});
 
@@ -52,6 +58,41 @@
     })
   }).addTo(map);
 
+  const groupName=f=>String(f.properties.phanLoaiTB||f.properties.phanLoai||'Chưa phân loại');
+  const groups=[...new Set(G.features.map(groupName))].sort((a,b)=>a.localeCompare(b,'vi'));
+  const palette=['#22c55e','#60a5fa','#f59e0b','#e879f9','#14b8a6','#fb7185','#a3e635','#818cf8','#f97316','#38bdf8','#c084fc','#facc15','#4ade80','#f472b6','#2dd4bf','#94a3b8'];
+  const groupColors=new Map(groups.map((n,i)=>[n,palette[i%palette.length]]));
+  const esc=v=>String(v??'-').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const gdb=L.geoJSON(G,{
+    style:f=>({color:'#334155',weight:.35,fillColor:groupColors.get(groupName(f)),fillOpacity:.72}),
+    smoothFactor:.15,
+    onEachFeature:(f,l)=>l.on('click',()=>{
+      const p=f.properties, rows=[
+        ['Chức năng',groupName(f)],['Tên đối tượng',p.ten],['Mã đối tượng',p.maDoiTuong],
+        ['Mã ô quy hoạch',p.maOQH],['Diện tích',p.dienTich],['Mật độ xây dựng',p.MDXDMin||p.MDXDMax],
+        ['Tầng cao',p.tangCaoMin||p.tangCaoMax],['Hệ số sử dụng đất',p.heSoSDD],['Ghi chú',p.ghiChu]
+      ];
+      info.innerHTML='<b style="font-size:16px;color:'+groupColors.get(groupName(f))+'">'+esc(groupName(f))+'</b>'+
+        rows.filter(r=>r[1]&&r[1]!=='-').map(r=>'<div style="margin-top:5px">'+esc(r[0])+': <b>'+esc(r[1])+'</b></div>').join('')+
+        '<div class="muted" style="margin-top:7px">Nguồn: QuyHoach.gdb · Chức năng sử dụng đất</div>';
+      info.classList.add('show');
+    })
+  }).addTo(map);
+  map.removeLayer(g);
+  document.getElementById('fc').textContent=G.features.length.toLocaleString('vi-VN');
+  document.getElementById('cc').textContent=groups.length.toLocaleString('vi-VN');
+  const gleg=document.getElementById('gdbLegend');
+  groups.forEach(n=>{
+    const count=G.features.filter(f=>groupName(f)===n).length;
+    gleg.insertAdjacentHTML('beforeend','<div class="li"><i class="sw" style="background:'+groupColors.get(n)+'"></i><span>'+esc(n)+' <span class="muted">· '+count.toLocaleString('vi-VN')+'</span></span></div>');
+  });
+  document.getElementById('toggleGDB').onchange=e=>{
+    if(e.target.checked){if(map.hasLayer(g))map.removeLayer(g);gdb.addTo(map);fit(gdb);}
+    else{map.removeLayer(gdb);g.addTo(map);fit(g);}
+    document.getElementById('fc').textContent=(e.target.checked?G.features.length:D.features.length).toLocaleString('vi-VN');
+    document.getElementById('cc').textContent=(e.target.checked?groups.length:codes.length).toLocaleString('vi-VN');
+  };
+
   function fit(layer=g){
     const b=layer.getBounds();
     if(!b || !b.isValid()) return;
@@ -61,7 +102,7 @@
       map.fitBounds(b,{paddingTopLeft:[330,90],paddingBottomRight:[60,60],maxZoom:17});
     }
   }
-  fit();
+  fit(gdb);
 
   const sel=document.getElementById('filter');
   const leg=document.getElementById('legend');
